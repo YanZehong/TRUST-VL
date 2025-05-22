@@ -5,12 +5,12 @@
 <!-- markdownlint-disable no-duplicate-header -->
 
 <div align="center">
-  <img src="https://github.com/deepseek-ai/DeepSeek-V2/blob/main/figures/logo.svg?raw=true" width="60%" alt="DeepSeek-R1" />
+  <img src="https://github.com/user-attachments/assets/3bb4b16d-efc3-4d46-b839-2e737445d7bd" width="60%" alt="DeepSeek-R1" />
 </div>
 <hr>
 <div align="center" style="line-height: 1;">
   <a href="https://yanzehong.github.io/" target="_blank"><img alt="Homepage"
-    src="https://github.com/user-attachments/assets/3bb4b16d-efc3-4d46-b839-2e737445d7bd"/></a>
+    src="https://img.shields.io/badge/Discord-DeepSeek%20AI-7289da?logo=discord&logoColor=white&color=7289da"/></a>
   <a href="https://huggingface.co/" target="_blank"><img alt="Hugging Face"
     src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-TRUST-VL%20AI-ffc107?color=ffc107&logoColor=white"/></a>
   <br>
