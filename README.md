@@ -5,15 +5,14 @@
 <!-- markdownlint-disable no-duplicate-header -->
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/3bb4b16d-efc3-4d46-b839-2e737445d7bd" width="60%" alt="DeepSeek-R1" />
+  <img src="https://github.com/user-attachments/assets/3bb4b16d-efc3-4d46-b839-2e737445d7bd" width="60%" alt="TRUST-VL" />
 </div>
 <hr>
 <div align="center" style="line-height: 1;">
   <a href="https://yanzehong.github.io/" target="_blank"><img alt="Homepage"
-    src="https://img.shields.io/badge/Discord-DeepSeek%20AI-7289da?logo=discord&logoColor=white&color=7289da"/></a>
-  <a href="https://huggingface.co/" target="_blank"><img alt="Hugging Face"
-    src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-TRUST-VL%20AI-ffc107?color=ffc107&logoColor=white"/></a>
-  <br>
+    src="https://img.shields.io/badge/Discord-TRUST--VL%20AI-7289da?logo=discord&logoColor=white&color=7289da"/></a>
+  <a href="https://huggingface.co/deepseek-ai" target="_blank"><img alt="Hugging Face"
+    src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-TRUST--VL-ffc107?color=ffc107&logoColor=white"/></a>
   <a href="https://github.com/blob/main/LICENSE"><img alt="License"
     src="https://img.shields.io/badge/License-MIT-f5de53?&color=f5de53"/></a>
   <br>
