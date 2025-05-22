@@ -1,4 +1,4 @@
-# 🌋 An Explainable News Assistant for General Multimodal Misinformation Detection
+# TRUST-VL: An Explainable News Assistant for General Multimodal Misinformation Detection
 
 <!-- markdownlint-disable first-line-h1 -->
 <!-- markdownlint-disable html -->
