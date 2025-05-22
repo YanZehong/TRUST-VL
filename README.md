@@ -10,8 +10,7 @@
 <hr>
 <div align="center" style="line-height: 1;">
   <a href="https://aclanthology.org/"> 
-    <img alt="arXiv" src="https://img.shields.io/badge/paper-B31B1B?logo=arXiv&labelColor=grey" />
-  </a> 
+    <img alt="arXiv" src="https://img.shields.io/badge/arXiv-Paper-B31B1B?logo=arXiv&labelColor=grey"/></a> 
   <a href="https://yanzehong.github.io/" target="_blank"><img alt="Homepage"
     src="https://img.shields.io/badge/TRUST--VL-Homepage-7289da?logo=github&logoColor=white&color=7289da"/></a>
   <a href="https://huggingface.co/deepseek-ai" target="_blank"><img alt="Hugging Face"
