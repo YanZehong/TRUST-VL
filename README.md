@@ -9,8 +9,11 @@
 </div>
 <hr>
 <div align="center" style="line-height: 1;">
+  <a href="https://aclanthology.org/"> 
+    <img alt="arXiv" src="https://img.shields.io/badge/paper-B31B1B?logo=arXiv&labelColor=grey" />
+  </a> 
   <a href="https://yanzehong.github.io/" target="_blank"><img alt="Homepage"
-    src="https://img.shields.io/badge/Discord-TRUST--VL%20AI-7289da?logo=discord&logoColor=white&color=7289da"/></a>
+    src="https://img.shields.io/badge/TRUST--VL-Homepage-7289da?logo=github&logoColor=white&color=7289da"/></a>
   <a href="https://huggingface.co/deepseek-ai" target="_blank"><img alt="Hugging Face"
     src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-TRUST--VL-ffc107?color=ffc107&logoColor=white"/></a>
   <a href="https://github.com/tatsu-lab/stanford_alpaca/blob/main/LICENSE"><img alt="License"
@@ -21,7 +24,7 @@
 
 ## Contents
 - [Install](#install)
-- [LLaVA Weights](#llava-weights)
+- [TRUST-VL Weights](#trust-vl-weights)
 - [Demo](#Demo)
 - [Model Zoo](https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md)
 - [Dataset](https://github.com/haotian-liu/LLaVA/blob/main/docs/Data.md)
@@ -109,7 +112,7 @@ eval_model(args)
 ```
 </details>
 
-## LLaVA Weights
+## TRUST-VL Weights
 Please check out our [Model Zoo](https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md) for all public LLaVA checkpoints, and the instructions of how to use the weights.
 
 ## Demo
