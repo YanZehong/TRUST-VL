@@ -1,12 +1,13 @@
 #!/bin/bash
 
-deepspeed llava/train/train_mem.py \
+deepspeed --include localhost:0,1,2,4 llava/train/train_misinformation.py \
     --deepspeed ./scripts/zero3.json \
-    --model_name_or_path liuhaotian/llava-v1.5-13b \
+    --model_name_or_path ./checkpoints/vicuna-13b-v1.5 \
     --version v1 \
     --data_path ./playground/data/llava_v1_5_mix665k.json \
     --image_folder ./playground/data \
     --vision_tower openai/clip-vit-large-patch14-336 \
+    --pretrain_mm_mlp_adapter ./checkpoints/llava-v1.5-13b-pretrain-558k/mm_projector.bin \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_layer -2 \
     --mm_use_im_start_end False \
@@ -14,11 +15,11 @@ deepspeed llava/train/train_mem.py \
     --image_aspect_ratio pad \
     --group_by_modality_length True \
     --bf16 True \
-    --output_dir ./checkpoints/llava-v1.5-13b-task \
+    --output_dir ./checkpoints/llava-v1.5-13b-pretrain-558k-finetune-665k \
     --num_train_epochs 1 \
-    --per_device_train_batch_size 16 \
-    --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 \
+    --per_device_train_batch_size 2 \
+    --per_device_eval_batch_size 1 \
+    --gradient_accumulation_steps 16 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 50000 \
@@ -29,7 +30,7 @@ deepspeed llava/train/train_mem.py \
     --lr_scheduler_type "cosine" \
     --logging_steps 1 \
     --tf32 True \
-    --model_max_length 2048 \
+    --model_max_length 4096 \
     --gradient_checkpointing True \
     --dataloader_num_workers 4 \
     --lazy_preprocess True \
