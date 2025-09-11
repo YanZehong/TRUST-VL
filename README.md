@@ -9,243 +9,65 @@
 </div>
 <hr>
 <div align="center" style="line-height: 1;">
-  <a href="https://aclanthology.org/"> 
+  <a href="https://arxiv.org/abs/2509.04448"> 
     <img alt="arXiv" src="https://img.shields.io/badge/arXiv-Paper-B31B1B?logo=arXiv&labelColor=grey"/></a> 
-  <a href="https://yanzehong.github.io/" target="_blank"><img alt="Homepage"
-    src="https://img.shields.io/badge/TRUST--VL-Homepage-7289da?logo=github&logoColor=white&color=7289da"/></a>
-  <a href="https://huggingface.co/deepseek-ai" target="_blank"><img alt="Hugging Face"
-    src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-TRUST--VL-ffc107?color=ffc107&logoColor=white"/></a>
+  <a href="https://yanzehong.github.io/trust-vl/" target="_blank"><img alt="Homepage"
+    src="https://img.shields.io/badge/TRUST--VL-Homepage-7289da?logo=googlegemini&logoColor=white&color=886FBF"/></a>
+  <a href="https://huggingface.co/" target="_blank"><img alt="Hugging Face"
+    src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-TRUST--VL-ffc107?color=FFD21E&logoColor=white"/></a>
+  <a href="https://huggingface.co/" target="_blank"><img alt="Hugging Face"
+    src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-TRUST--Instruct-ffc107?color=ffc107&logoColor=white"/></a>
   <a href="https://github.com/tatsu-lab/stanford_alpaca/blob/main/LICENSE"><img alt="License"
     src="https://img.shields.io/badge/Code%20License-Apache_2.0-green.svg"/></a>
   <br>
 </div>
 
+## News
+[2025/09/06] 🔥 TRUST-VL is realsed. Model checkpoints and TRUST-Instruct is coming soon. Checkout the [paper](https://arxiv.org/abs/2509.04448) for more details.
 
 ## Contents
-- [Install](#install)
-- [TRUST-VL Weights](#trust-vl-weights)
-- [Demo](#Demo)
-- [Model Zoo](https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md)
-- [Dataset](https://github.com/haotian-liu/LLaVA/blob/main/docs/Data.md)
-- [Train](#train)
-- [Evaluation](#evaluation)
+- [Quickstart](#quickstart)
+- [Training](#training)
+- [Evals](#evals)
 
-## Install
+## Quickstart
+Take your first steps with the TRUST-VL model.
 
-If you are not using Linux, do *NOT* proceed, see instructions for [macOS](https://github.com/haotian-liu/LLaVA/blob/main/docs/macOS.md) and [Windows](https://github.com/haotian-liu/LLaVA/blob/main/docs/Windows.md).
-
-1. Clone this repository and navigate to LLaVA folder
+1. Clone this repository and install package
 ```bash
-git clone https://github.com/haotian-liu/LLaVA.git
-cd LLaVA
-```
-
-2. Install Package
-```Shell
-conda create -n llava python=3.10 -y
-conda activate llava
-pip install --upgrade pip  # enable PEP 660 support
+git clone https://github.com/YanZehong/TRUST-VL.git
+cd TRUST-VL
+conda create -n trust-vl python=3.10 -y
+conda activate trust-vl
+pip install --upgrade pip
 pip install -e .
+
 ```
 
-3. Install additional packages for training cases
-```
+<details>
+<summary>(Optional) Install additional packages for training cases</summary>
+
+```bash
 pip install -e ".[train]"
 pip install flash-attn --no-build-isolation
 ```
 
-### Upgrade to latest code base
-
-```Shell
-git pull
-pip install -e .
-
-# if you see some import errors when you upgrade,
-# please try running the command below (without #)
-# pip install flash-attn --no-build-isolation --no-cache-dir
-```
-
-### Quick Start With HuggingFace
-
-<details>
-<summary>Example Code</summary>
-
-```Python
-from llava.model.builder import load_pretrained_model
-from llava.mm_utils import get_model_name_from_path
-from llava.eval.run_llava import eval_model
-
-model_path = "liuhaotian/llava-v1.5-7b"
-
-tokenizer, model, image_processor, context_len = load_pretrained_model(
-    model_path=model_path,
-    model_base=None,
-    model_name=get_model_name_from_path(model_path)
-)
-```
-
-Check out the details wth the `load_pretrained_model` function in `llava/model/builder.py`.
-
-You can also use the `eval_model` function in `llava/eval/run_llava.py` to get the output easily. By doing so, you can use this code on Colab directly after downloading this repository.
-
-``` python
-model_path = "liuhaotian/llava-v1.5-7b"
-prompt = "What are the things I should be cautious about when I visit here?"
-image_file = "https://llava-vl.github.io/static/images/view.jpg"
-
-args = type('Args', (), {
-    "model_path": model_path,
-    "model_base": None,
-    "model_name": get_model_name_from_path(model_path),
-    "query": prompt,
-    "conv_mode": None,
-    "image_file": image_file,
-    "sep": ",",
-    "temperature": 0,
-    "top_p": None,
-    "num_beams": 1,
-    "max_new_tokens": 512
-})()
-
-eval_model(args)
-```
 </details>
 
-## TRUST-VL Weights
-Please check out our [Model Zoo](https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md) for all public LLaVA checkpoints, and the instructions of how to use the weights.
 
-## Demo
+## Model Weights
 
-### Gradio Web UI
+Please check out [🤗 Huggingface Models](https://huggingface.co/) for public LLaVA checkpoints.
 
-To launch a Gradio demo locally, please run the following commands one by one. If you plan to launch multiple model workers to compare between different checkpoints, you only need to launch the controller and the web server *ONCE*.
-
-```mermaid
-flowchart BT
-    %% Declare Nodes
-    gws("Gradio (UI Server)")
-    c("Controller (API Server):<br/>PORT: 10000")
-    mw7b("Model Worker:<br/>llava-v1.5-7b<br/>PORT: 40000")
-    mw13b("Model Worker:<br/>llava-v1.5-13b<br/>PORT: 40001")
-    sglw13b("SGLang Backend:<br/>llava-v1.6-34b<br/>http://localhost:30000")
-    lsglw13b("SGLang Worker:<br/>llava-v1.6-34b<br/>PORT: 40002")
-
-    %% Declare Styles
-    classDef data fill:#3af,stroke:#48a,stroke-width:2px,color:#444
-    classDef success fill:#8f8,stroke:#0a0,stroke-width:2px,color:#444
-    classDef failure fill:#f88,stroke:#f00,stroke-width:2px,color:#444
-
-    %% Assign Styles
-    class id,od data;
-    class cimg,cs_s,scsim_s success;
-    class ncimg,cs_f,scsim_f failure;
-
-    subgraph Demo Connections
-        direction BT
-        c<-->gws
-        
-        mw7b<-->c
-        mw13b<-->c
-        lsglw13b<-->c
-        sglw13b<-->lsglw13b
-    end
+```
+git lfs install
+git clone https://huggingface.co
 ```
 
-#### Launch a controller
-```Shell
-python -m llava.serve.controller --host 0.0.0.0 --port 10000
-```
 
-#### Launch a gradio web server.
-```Shell
-python -m llava.serve.gradio_web_server --controller http://localhost:10000 --model-list-mode reload
-```
-You just launched the Gradio web interface. Now, you can open the web interface with the URL printed on the screen. You may notice that there is no model in the model list. Do not worry, as we have not launched any model worker yet. It will be automatically updated when you launch a model worker.
+## Training
 
-#### Launch a SGLang worker
-
-This is the recommended way to serve LLaVA model with high throughput, and you need to install SGLang first. Note that currently `4-bit` quantization is not supported yet on SGLang-LLaVA, and if you have limited GPU VRAM, please check out model worker with [quantization](https://github.com/haotian-liu/LLaVA?tab=readme-ov-file#launch-a-model-worker-4-bit-8-bit-inference-quantized).
-
-```Shell
-pip install "sglang[all]"
-```
-
-You'll first launch a SGLang backend worker which will execute the models on GPUs. Remember the `--port` you've set and you'll use that later.
-
-```Shell
-# Single GPU
-CUDA_VISIBLE_DEVICES=0 python3 -m sglang.launch_server --model-path liuhaotian/llava-v1.5-7b --tokenizer-path llava-hf/llava-1.5-7b-hf --port 30000
-
-# Multiple GPUs with tensor parallel
-CUDA_VISIBLE_DEVICES=0,1 python3 -m sglang.launch_server --model-path liuhaotian/llava-v1.5-13b --tokenizer-path llava-hf/llava-1.5-13b-hf --port 30000 --tp 2
-```
-
-Tokenizers (temporary): `llava-hf/llava-1.5-7b-hf`, `llava-hf/llava-1.5-13b-hf`, `liuhaotian/llava-v1.6-34b-tokenizer`.
-
-You'll then launch a LLaVA-SGLang worker that will communicate between LLaVA controller and SGLang backend to route the requests. Set `--sgl-endpoint` to `http://127.0.0.1:port` where `port` is the one you just set (default: 30000).
-
-```Shell
-python -m llava.serve.sglang_worker --host 0.0.0.0 --controller http://localhost:10000 --port 40000 --worker http://localhost:40000 --sgl-endpoint http://127.0.0.1:30000
-```
-
-#### Launch a model worker
-
-This is the actual *worker* that performs the inference on the GPU.  Each worker is responsible for a single model specified in `--model-path`.
-
-```Shell
-python -m llava.serve.model_worker --host 0.0.0.0 --controller http://localhost:10000 --port 40000 --worker http://localhost:40000 --model-path liuhaotian/llava-v1.5-13b
-```
-Wait until the process finishes loading the model and you see "Uvicorn running on ...".  Now, refresh your Gradio web UI, and you will see the model you just launched in the model list.
-
-You can launch as many workers as you want, and compare between different model checkpoints in the same Gradio interface. Please keep the `--controller` the same, and modify the `--port` and `--worker` to a different port number for each worker.
-```Shell
-python -m llava.serve.model_worker --host 0.0.0.0 --controller http://localhost:10000 --port <different from 40000, say 40001> --worker http://localhost:<change accordingly, i.e. 40001> --model-path <ckpt2>
-```
-
-If you are using an Apple device with an M1 or M2 chip, you can specify the mps device by using the `--device` flag: `--device mps`.
-
-#### Launch a model worker (Multiple GPUs, when GPU VRAM <= 24GB)
-
-If the VRAM of your GPU is less than 24GB (e.g., RTX 3090, RTX 4090, etc.), you may try running it with multiple GPUs. Our latest code base will automatically try to use multiple GPUs if you have more than one GPU. You can specify which GPUs to use with `CUDA_VISIBLE_DEVICES`. Below is an example of running with the first two GPUs.
-
-```Shell
-CUDA_VISIBLE_DEVICES=0,1 python -m llava.serve.model_worker --host 0.0.0.0 --controller http://localhost:10000 --port 40000 --worker http://localhost:40000 --model-path liuhaotian/llava-v1.5-13b
-```
-
-#### Launch a model worker (4-bit, 8-bit inference, quantized)
-
-You can launch the model worker with quantized bits (4-bit, 8-bit), which allows you to run the inference with reduced GPU memory footprint, potentially allowing you to run on a GPU with as few as 12GB VRAM. Note that inference with quantized bits may not be as accurate as the full-precision model. Simply append `--load-4bit` or `--load-8bit` to the **model worker** command that you are executing. Below is an example of running with 4-bit quantization.
-
-```Shell
-python -m llava.serve.model_worker --host 0.0.0.0 --controller http://localhost:10000 --port 40000 --worker http://localhost:40000 --model-path liuhaotian/llava-v1.5-13b --load-4bit
-```
-
-#### Launch a model worker (LoRA weights, unmerged)
-
-You can launch the model worker with LoRA weights, without merging them with the base checkpoint, to save disk space. There will be additional loading time, while the inference speed is the same as the merged checkpoints. Unmerged LoRA checkpoints do not have `lora-merge` in the model name, and are usually much smaller (less than 1GB) than the merged checkpoints (13G for 7B, and 25G for 13B).
-
-To load unmerged LoRA weights, you simply need to pass an additional argument `--model-base`, which is the base LLM that is used to train the LoRA weights. You can check the base LLM of each LoRA weights in the [model zoo](https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md).
-
-```Shell
-python -m llava.serve.model_worker --host 0.0.0.0 --controller http://localhost:10000 --port 40000 --worker http://localhost:40000 --model-path liuhaotian/llava-v1-0719-336px-lora-vicuna-13b-v1.3 --model-base lmsys/vicuna-13b-v1.3
-```
-
-### CLI Inference
-
-Chat about images using LLaVA without the need of Gradio interface. It also supports multiple GPUs, 4-bit and 8-bit quantized inference. With 4-bit quantization, for our LLaVA-1.5-7B, it uses less than 8GB VRAM on a single GPU.
-
-```Shell
-python -m llava.serve.cli \
-    --model-path liuhaotian/llava-v1.5-7b \
-    --image-file "https://llava-vl.github.io/static/images/view.jpg" \
-    --load-4bit
-```
-
-<img src="images/demo_cli.gif" width="70%">
-
-## Train
-
-*Below is the latest training configuration for LLaVA v1.5. For legacy models, please refer to README of [this](https://github.com/haotian-liu/LLaVA/tree/v1.0.1) version for now. We'll add them in a separate doc later.*
+TRUST-VL is built on [LLaVA v1.5](https://github.com/haotian-liu/LLaVA). Fine-tune the base model from scratch and get better peformance, optimization, and task-specific model behavior.
 
 LLaVA training consists of two stages: (1) feature alignment stage: use our 558K subset of the LAION-CC-SBU dataset to connect a *frozen pretrained* vision encoder to a *frozen LLM*; (2) visual instruction tuning stage: use 150K GPT-generated multimodal instruction-following data, plus around 515K VQA data from academic-oriented tasks, to teach the model to follow multimodal instructions.
 
@@ -339,7 +161,8 @@ New options to note:
 - `--image_aspect_ratio pad`: this pads the non-square images to square, instead of cropping them; it slightly reduces hallucination.
 - `--group_by_modality_length True`: this should only be used when your instruction tuning dataset contains both language (e.g. ShareGPT) and multimodal (e.g. LLaVA-Instruct). It makes the training sampler only sample a single modality (either image or language) during training, which we observe to speed up training by ~25%, and does not affect the final outcome.
 
-## Evaluation
+## Evals
+Test the model through evaluations.
 
 In LLaVA-1.5, we evaluate models on a diverse set of 12 benchmarks. To ensure the reproducibility, we evaluate the models with greedy decoding. We do not evaluate using beam search to make the inference process consistent with the chat demo of real-time outputs.
 
@@ -383,44 +206,18 @@ python summarize_gpt_review.py
 
 ## Citation
 
-If you find LLaVA useful for your research and applications, please cite using this BibTeX:
+If you find our paper and code useful in your research, please consider giving a star ⭐ and citation 📝 :)
+
 ```bibtex
-@misc{liu2024llavanext,
-    title={LLaVA-NeXT: Improved reasoning, OCR, and world knowledge},
-    url={https://llava-vl.github.io/blog/2024-01-30-llava-next/},
-    author={Liu, Haotian and Li, Chunyuan and Li, Yuheng and Li, Bo and Zhang, Yuanhan and Shen, Sheng and Lee, Yong Jae},
-    month={January},
-    year={2024}
-}
-
-@misc{liu2023improvedllava,
-      title={Improved Baselines with Visual Instruction Tuning}, 
-      author={Liu, Haotian and Li, Chunyuan and Li, Yuheng and Lee, Yong Jae},
-      publisher={arXiv:2310.03744},
-      year={2023},
-}
-
-@misc{liu2023llava,
-      title={Visual Instruction Tuning}, 
-      author={Liu, Haotian and Li, Chunyuan and Wu, Qingyang and Lee, Yong Jae},
-      publisher={NeurIPS},
-      year={2023},
+@article{yan2025trustvl,
+  title={{TRUST-VL}: An Explainable News Assistant for General Multimodal Misinformation Detection},
+  author={Yan, Zehong and Qi, Peng and Hsu, Wynne and Lee, Mong Li},
+  journal={arXiv preprint arXiv:2509.04448},
+  year={2025}
 }
 ```
 
 ## Acknowledgement
+LLaVA, Vicuna: Thanks to their amazing works.
 
-- [Vicuna](https://github.com/lm-sys/FastChat): the codebase we built upon, and our base model Vicuna-13B that has the amazing language capabilities!
-
-[![Code License](https://img.shields.io/badge/Code%20License-Apache_2.0-green.svg)](https://github.com/tatsu-lab/stanford_alpaca/blob/main/LICENSE)
-**Usage and License Notices**: This project utilizes certain datasets and checkpoints that are subject to their respective original licenses. Users must comply with all terms and conditions of these original licenses, including but not limited to the [OpenAI Terms of Use](https://openai.com/policies/terms-of-use) for the dataset and the specific licenses for base language models for checkpoints trained using the dataset (e.g. [Llama community license](https://ai.meta.com/llama/license/) for LLaMA-2 and Vicuna-v1.5). This project does not impose any additional constraints beyond those stipulated in the original licenses. Furthermore, users are reminded to ensure that their use of the dataset and checkpoints is in compliance with all applicable laws and regulations.
-
-## Related Projects
-
-- [Instruction Tuning with GPT-4](https://github.com/Instruction-Tuning-with-GPT-4/GPT-4-LLM)
-- [LLaVA-Med: Training a Large Language-and-Vision Assistant for Biomedicine in One Day](https://github.com/microsoft/LLaVA-Med)
-- [Otter: In-Context Multi-Modal Instruction Tuning](https://github.com/Luodian/Otter)
-
-For future project ideas, please check out:
-- [SEEM: Segment Everything Everywhere All at Once](https://github.com/UX-Decoder/Segment-Everything-Everywhere-All-At-Once)
-- [Grounded-Segment-Anything](https://github.com/IDEA-Research/Grounded-Segment-Anything) to detect, segment, and generate anything by marrying [Grounding DINO](https://github.com/IDEA-Research/GroundingDINO) and [Segment-Anything](https://github.com/facebookresearch/segment-anything).
+**Usage and License Notices**: This project utilizes certain datasets and checkpoints that are subject to their respective original licenses. Users must comply with all terms and conditions of these original licenses, including but not limited to the OpenAI Terms of Use for the dataset and the specific licenses for base language models. This project does not impose any additional constraints beyond those stipulated in the original licenses. Furthermore, users are reminded to ensure that their use of the dataset and checkpoints is in compliance with all applicable laws and regulations.
