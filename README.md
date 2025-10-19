@@ -72,7 +72,7 @@ Similar to LLaVA, TRUST-VL is trained on 8 A100 GPUs with 80GB memory. To train 
 
 ### Stage 1: Language-Image Alignment + News Domain Alignment
 
-Please download the 1211K subset we use in the paper [here](), which is based on the [LAION-CC-SBU dataset](https://huggingface.co/datasets/liuhaotian/LLaVA-Pretrain).
+Please download the 1211K subset we use in the paper [here](https://huggingface.co/datasets/NUSryan/TRUST-Instruct), which is based on the [LAION-CC-SBU dataset](https://huggingface.co/datasets/liuhaotian/LLaVA-Pretrain).
 
 Training script with DeepSpeed ZeRO-2: [`trust_vl_stage1.sh`](https://github.com/YanZehong/TRUST-VL/blob/main/scripts/trust_vl_stage1.sh).
 
@@ -111,7 +111,28 @@ Training script with DeepSpeed ZeRO-3: [`trust_vl_stage2.sh`](https://github.com
 
 ### Stage 3: Misinformation Tuning
 
-Please download the annotation of the final mixture our instruction tuning data [TRUST-Instruct_task198k.json](), and download the images from constituting datasets. After downloading all of them, organize the data as follows in `./data`,
+Please download the annotation of the final mixture our instruction tuning data [TRUST-Instruct_task198k.json](https://huggingface.co/datasets/NUSryan/TRUST-Instruct), and download the images from constituting datasets. 
+
+- **VisualNews:**
+    1. Request the VisualNews Dataset at [here](https://github.com/FuxiaoLiu/VisualNews-Repository).  
+    2. Place the files under the `./data` folder.  
+
+- **NewsCLIPpings:**  
+    1. Git clone the [`news_clippings`](https://github.com/g-luo/news_clippings/) repository.  
+    2. Run `./download.sh`.  
+    3. More details can be found in [here](https://github.com/g-luo/news_clippings).  
+    4. Download already-collected evidence according to the instrustions in [here](https://github.com/S-Abdelnabi/OoC-multi-modal-fc).  
+
+- **DGM4:**  
+    Download the DGM4 dataset through this link: [DGM4](https://huggingface.co/datasets/rshaojimmy/DGM4).
+
+- **Factify2:**  
+    Download the Factify2 dataset according to the instruction [here](https://github.com/surya1701/Factify-2.0).
+
+- **MMFakeBench:**  
+    You should strictly follow the data usage guidelines by filling in [Data Usage Protocol on Huggingface](https://huggingface.co/datasets/liuxuannan/MMFakeBench) from [MMFakeBench](https://github.com/liuxuannan/MMFakeBench?tab=readme-ov-file).
+
+After downloading all of them, organize the data as follows in `./data`,
 
 ```
 ├── origin
