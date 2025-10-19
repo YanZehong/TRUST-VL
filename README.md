@@ -13,9 +13,9 @@
     <img alt="arXiv" src="https://img.shields.io/badge/arXiv-Paper-B31B1B?logo=arXiv&labelColor=grey"/></a> 
   <a href="https://yanzehong.github.io/trust-vl/" target="_blank"><img alt="Homepage"
     src="https://img.shields.io/badge/TRUST--VL-Homepage-7289da?logo=googlegemini&logoColor=white&color=886FBF"/></a>
-  <a href="https://huggingface.co/" target="_blank"><img alt="Hugging Face"
+  <a href="https://huggingface.co/NUSryan/TRUST-VL-13b-task" target="_blank"><img alt="Hugging Face"
     src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-TRUST--VL-ffc107?color=FFD21E&logoColor=white"/></a>
-  <a href="https://huggingface.co/" target="_blank"><img alt="Hugging Face"
+  <a href="https://huggingface.co/datasets/NUSryan/TRUST-Instruct" target="_blank"><img alt="Hugging Face"
     src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-TRUST--Instruct-ffc107?color=ffc107&logoColor=white"/></a>
   <a href="https://github.com/tatsu-lab/stanford_alpaca/blob/main/LICENSE"><img alt="License"
     src="https://img.shields.io/badge/Code%20License-Apache_2.0-green.svg"/></a>

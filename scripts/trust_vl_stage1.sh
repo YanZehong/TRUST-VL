@@ -4,7 +4,7 @@ deepspeed llava/train/train_mem.py \
     --deepspeed ./scripts/zero2.json \
     --model_name_or_path ./checkpoints/vicuna-13b-v1.5 \
     --version plain \
-    --data_path ./data/pretrain_1211k_llava_pretrain_558k_visualnews_653k.json \
+    --data_path ./data/trustvl_stage1_1211k.json \
     --image_folder ./data \
     --vision_tower openai/clip-vit-large-patch14-336 \
     --mm_projector_type mlp2x_gelu \
