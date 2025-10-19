@@ -37,8 +37,8 @@ Take your first steps with the TRUST-VL model.
 ```bash
 git clone https://github.com/YanZehong/TRUST-VL.git
 cd TRUST-VL
-conda create -n trust-vl python=3.10 -y
-conda activate trust-vl
+conda create -n trustvl python=3.10 -y
+conda activate trustvl
 pip install --upgrade pip
 pip install -e .
 
@@ -49,7 +49,7 @@ pip install -e .
 
 ```bash
 pip install -e ".[train]"
-pip install flash-attn --no-build-isolation
+pip install flash-attn==2.6.3 --no-build-isolation #--no-cache-dir
 ```
 
 </details>
@@ -64,56 +64,23 @@ git lfs install
 git clone https://huggingface.co
 ```
 
-
 ## Training
+TRUST-VL training consists of three stages:
+In Stage 1, we begin by training the projection module for one epoch on 1.2 million image–text pairs (653K news samples from VisualNews and 558K samples from the LLaVA training corpus). This stage aligns the visual features with the language model. In Stage 2, we jointly train  the LLM and the projection module for one epoch using 665K synthetic conversation samples from the LLaVA training corpus to improve the  model’s ability to follow complex instructions. In Stage 3, we fine-tune the full model on 198K reasoning samples from TRUST-Instruct for three epochs to further enhance its misinformation-specific reasoning capabilities.  
 
-TRUST-VL is built on [LLaVA v1.5](https://github.com/haotian-liu/LLaVA). Fine-tune the base model from scratch and get better peformance, optimization, and task-specific model behavior.
+Similar to LLaVA, TRUST-VL is trained on 8 A100 GPUs with 80GB memory. To train on fewer GPUs, you can reduce the `per_device_train_batch_size` and increase the `gradient_accumulation_steps` accordingly. Always keep the global batch size the same: `per_device_train_batch_size` x `gradient_accumulation_steps` x `num_gpus`.
 
-LLaVA training consists of two stages: (1) feature alignment stage: use our 558K subset of the LAION-CC-SBU dataset to connect a *frozen pretrained* vision encoder to a *frozen LLM*; (2) visual instruction tuning stage: use 150K GPT-generated multimodal instruction-following data, plus around 515K VQA data from academic-oriented tasks, to teach the model to follow multimodal instructions.
+### Stage 1: Language-Image Alignment + News Domain Alignment
 
-LLaVA is trained on 8 A100 GPUs with 80GB memory. To train on fewer GPUs, you can reduce the `per_device_train_batch_size` and increase the `gradient_accumulation_steps` accordingly. Always keep the global batch size the same: `per_device_train_batch_size` x `gradient_accumulation_steps` x `num_gpus`.
+Please download the 1211K subset we use in the paper [here](), which is based on the [LAION-CC-SBU dataset](https://huggingface.co/datasets/liuhaotian/LLaVA-Pretrain).
 
-### Hyperparameters
-We use a similar set of hyperparameters as Vicuna in finetuning.  Both hyperparameters used in pretraining and finetuning are provided below.
-
-1. Pretraining
-
-| Hyperparameter | Global Batch Size | Learning rate | Epochs | Max length | Weight decay |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| LLaVA-v1.5-13B | 256 | 1e-3 | 1 | 2048 | 0 |
-
-2. Finetuning
-
-| Hyperparameter | Global Batch Size | Learning rate | Epochs | Max length | Weight decay |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| LLaVA-v1.5-13B | 128 | 2e-5 | 1 | 2048 | 0 |
-
-### Download Vicuna checkpoints (automatically)
-
-Our base model Vicuna v1.5, which is an instruction-tuned chatbot, will be downloaded automatically when you run our provided training scripts. No action is needed.
-
-### Pretrain (feature alignment)
-
-Please download the 558K subset of the LAION-CC-SBU dataset with BLIP captions we use in the paper [here](https://huggingface.co/datasets/liuhaotian/LLaVA-Pretrain).
-
-Pretrain takes around 5.5 hours for LLaVA-v1.5-13B on 8x A100 (80G), due to the increased resolution to 336px. It takes around 3.5 hours for LLaVA-v1.5-7B.
-
-Training script with DeepSpeed ZeRO-2: [`pretrain.sh`](https://github.com/haotian-liu/LLaVA/blob/main/scripts/v1_5/pretrain.sh).
+Training script with DeepSpeed ZeRO-2: [`trust_vl_stage1.sh`](https://github.com/YanZehong/TRUST-VL/blob/main/scripts/trust_vl_stage1.sh).
 
 - `--mm_projector_type mlp2x_gelu`: the two-layer MLP vision-language connector.
 - `--vision_tower openai/clip-vit-large-patch14-336`: CLIP ViT-L/14 336px.
 
-<details>
-<summary>Pretrain takes around 20 hours for LLaVA-7B on 8x V100 (32G)</summary>
 
- We provide training script with DeepSpeed [here](https://github.com/haotian-liu/LLaVA/blob/main/scripts/pretrain_xformers.sh).
-Tips:
-- If you are using V100 which is not supported by FlashAttention, you can use the [memory-efficient attention](https://arxiv.org/abs/2112.05682) implemented in [xFormers](https://github.com/facebookresearch/xformers). Install xformers and replace `llava/train/train_mem.py` above with [llava/train/train_xformers.py](llava/train/train_xformers.py).
-</details>
-
-### Visual Instruction Tuning
-
-1. Prepare data
+### Stage 2: Visual Instruction Tuning
 
 Please download the annotation of the final mixture our instruction tuning data [llava_v1_5_mix665k.json](https://huggingface.co/datasets/liuhaotian/LLaVA-Instruct-150K/blob/main/llava_v1_5_mix665k.json), and download the images from constituting datasets:
 
@@ -123,7 +90,7 @@ Please download the annotation of the final mixture our instruction tuning data 
 - TextVQA: [train_val_images](https://dl.fbaipublicfiles.com/textvqa/images/train_val_images.zip)
 - VisualGenome: [part1](https://cs.stanford.edu/people/rak248/VG_100K_2/images.zip), [part2](https://cs.stanford.edu/people/rak248/VG_100K_2/images2.zip)
 
-After downloading all of them, organize the data as follows in `./playground/data`,
+After downloading all of them, organize the data as follows in `./data`,
 
 ```
 ├── coco
@@ -139,70 +106,42 @@ After downloading all of them, organize the data as follows in `./playground/dat
     └── VG_100K_2
 ```
 
-2. Start training!
+Training script with DeepSpeed ZeRO-3: [`trust_vl_stage2.sh`](https://github.com/YanZehong/TRUST-VL/blob/main/scripts/trust_vl_stage2.sh).
 
-You may download our pretrained projectors in [Model Zoo](https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md). It is not recommended to use legacy projectors, as they may be trained with a different version of the codebase, and if any option is off, the model will not function/train as we expected.
 
-Visual instruction tuning takes around 20 hours for LLaVA-v1.5-13B on 8x A100 (80G), due to the increased resolution to 336px. It takes around 10 hours for LLaVA-v1.5-7B on 8x A100 (40G).
+### Stage 3: Misinformation Tuning
 
-Training script with DeepSpeed ZeRO-3: [`finetune.sh`](https://github.com/haotian-liu/LLaVA/blob/main/scripts/v1_5/finetune.sh).
+Please download the annotation of the final mixture our instruction tuning data [TRUST-Instruct_task198k.json](), and download the images from constituting datasets. After downloading all of them, organize the data as follows in `./data`,
 
-If you are do not have enough GPU memory:
+```
+├── origin
+│   ├── bbc
+│   ├── guardian
+│   ├── usa_today
+│   ├── washington_post
+│   └── data.json
+├── DGM4
+│   ├── manipulation
+│   ├── metadata
+│   └── origin
+├── Factify2
+│   ├── data
+│   └── images-train
+├── MMFakeBench
+│   ├── fake
+│   ├── real
+    └── source
+```
 
-- Use LoRA: [`finetune_lora.sh`](https://github.com/haotian-liu/LLaVA/blob/main/scripts/v1_5/finetune_lora.sh). We are able to fit 13B training in 8-A100-40G/8-A6000, and 7B training in 8-RTX3090. Make sure `per_device_train_batch_size*gradient_accumulation_steps` is the same as the provided script for best reproducibility.
-- Replace `zero3.json` with `zero3_offload.json` which offloads some parameters to CPU RAM. This slows down the training speed.
-
-If you are interested in finetuning LLaVA model to your own task/data, please check out [`Finetune_Custom_Data.md`](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md)。
-
-New options to note:
-
-- `--mm_projector_type mlp2x_gelu`: the two-layer MLP vision-language connector.
-- `--vision_tower openai/clip-vit-large-patch14-336`: CLIP ViT-L/14 336px.
-- `--image_aspect_ratio pad`: this pads the non-square images to square, instead of cropping them; it slightly reduces hallucination.
-- `--group_by_modality_length True`: this should only be used when your instruction tuning dataset contains both language (e.g. ShareGPT) and multimodal (e.g. LLaVA-Instruct). It makes the training sampler only sample a single modality (either image or language) during training, which we observe to speed up training by ~25%, and does not affect the final outcome.
+Training script with DeepSpeed ZeRO-3: [`trust_vl_stage3.sh`](https://github.com/YanZehong/TRUST-VL/blob/main/scripts/trust_vl_stage3.sh).
 
 ## Evals
-Test the model through evaluations.
+In TRUST-VL, we evaluate models on a diverse set of 7 misinformation benchmarks. For example,
 
-In LLaVA-1.5, we evaluate models on a diverse set of 12 benchmarks. To ensure the reproducibility, we evaluate the models with greedy decoding. We do not evaluate using beam search to make the inference process consistent with the chat demo of real-time outputs.
-
-See [Evaluation.md](https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md).
-
-### GPT-assisted Evaluation
-
-Our GPT-assisted evaluation pipeline for multimodal modeling is provided for a comprehensive understanding of the capabilities of vision-language models.  Please see our paper for more details.
-
-1. Generate LLaVA responses
-
-```Shell
-python model_vqa.py \
-    --model-path ./checkpoints/LLaVA-13B-v0 \
-    --question-file \
-    playground/data/coco2014_val_qa_eval/qa90_questions.jsonl \
-    --image-folder \
-    /path/to/coco2014_val \
-    --answers-file \
-    /path/to/answer-file-our.jsonl
+```bash
+CUDA_VISIBLE_DEVICES=0 bash /home/zehong/TRUST-VL/scripts/eval/newsclippings.sh
 ```
 
-2. Evaluate the generated responses.  In our case, [`answer-file-ref.jsonl`](./playground/data/coco2014_val_qa_eval/qa90_gpt4_answer.jsonl) is the response generated by text-only GPT-4 (0314), with the context captions/boxes provided.
-
-```Shell
-OPENAI_API_KEY="sk-***********************************" python llava/eval/eval_gpt_review_visual.py \
-    --question playground/data/coco2014_val_qa_eval/qa90_questions.jsonl \
-    --context llava/eval/table/caps_boxes_coco2014_val_80.jsonl \
-    --answer-list \
-    /path/to/answer-file-ref.jsonl \
-    /path/to/answer-file-our.jsonl \
-    --rule llava/eval/table/rule.json \
-    --output /path/to/review.json
-```
-
-3. Summarize the evaluation results
-
-```Shell
-python summarize_gpt_review.py
-```
 
 ## Citation
 

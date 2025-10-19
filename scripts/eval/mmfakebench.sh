@@ -5,32 +5,32 @@ IFS=',' read -ra GPULIST <<< "$gpu_list"
 
 CHUNKS=${#GPULIST[@]}
 
-CKPT="veritas-7b-ablation-mistral"
+CKPT="trustvl-13b-task"
 SPLIT="val"
 
 for IDX in $(seq 0 $((CHUNKS-1))); do
     CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m llava.eval.eval_mmfakebench \
-        --model-path /home/zehong/LLaVA/checkpoints/veritas-7b-newstune-198k-ablation_v1.6-mistral \
-        --question-file /home/zehong/LLaVA/data/MMFakeBench_val/source/MMFakeBench_evidence_val.jsonl \
-        --image-folder /home/zehong/LLaVA/data/MMFakeBench_val \
-        --answers-file /home/zehong/LLaVA/outputs/eval/MMFakeBench/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl \
+        --model-path ./checkpoints/trustvl-13b-task \
+        --question-file ./data/eval/MMFakeBench_1000.jsonl \
+        --image-folder ./data/MMFakeBench_val \
+        --answers-file ./outputs/eval/MMFakeBench/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
         --chunk-idx $IDX &
 done
 
 wait
 
-output_file="/home/zehong/LLaVA/outputs/eval/MMFakeBench/$SPLIT/$CKPT/merge.jsonl"
+output_file="./outputs/eval/MMFakeBench/$SPLIT/$CKPT/merge.jsonl"
 
 # Clear out the output file if it exists.
 > "$output_file"
 
 # Loop through the indices and concatenate each file.
 for IDX in $(seq 0 $((CHUNKS-1))); do
-    cat /home/zehong/LLaVA/outputs/eval/MMFakeBench/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl >> "$output_file"
+    cat ./outputs/eval/MMFakeBench/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl >> "$output_file"
 done
 
-python /home/zehong/LLaVA/llava/eval/eval_results.py \
+python ./llava/eval/eval_results.py \
     --judge_file $output_file \
     --label_reference 'mixed' &
 

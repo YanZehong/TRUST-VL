@@ -1,0 +1,297 @@
+import os
+import json
+import re
+import argparse
+import torch
+import math
+import requests
+import pandas as pd
+import numpy as np
+
+from tqdm import tqdm
+from PIL import Image
+from io import BytesIO
+
+from llava.constants import (
+    IMAGE_TOKEN_INDEX,
+    DEFAULT_IMAGE_TOKEN,
+    DEFAULT_IM_START_TOKEN,
+    DEFAULT_IM_END_TOKEN,
+    IMAGE_PLACEHOLDER,
+)
+
+from llava.conversation import conv_templates, SeparatorStyle
+from llava.model.builder import load_pretrained_model
+from llava.utils import disable_torch_init
+from llava.mm_utils import (
+    process_images,
+    tokenizer_image_token,
+    get_model_name_from_path,
+)
+
+
+
+def split_list(lst, n):
+    """Split a list into n (roughly) equal-sized chunks"""
+    chunk_size = math.ceil(len(lst) / n)  # integer division
+    return [lst[i:i+chunk_size] for i in range(0, len(lst), chunk_size)]
+
+
+def get_chunk(lst, n, k):
+    chunks = split_list(lst, n)
+    return chunks[k]
+
+def image_parser(args):
+    out = args.image_file.split(args.sep)
+    return out
+
+
+def load_image(image_file):
+    if image_file.startswith("http") or image_file.startswith("https"):
+        response = requests.get(image_file)
+        image = Image.open(BytesIO(response.content)).convert("RGB")
+    else:
+        image = Image.open(image_file).convert("RGB")
+    return image
+
+
+def load_images(image_files):
+    out = []
+    for image_file in image_files:
+        image = load_image(image_file)
+        out.append(image)
+    return out
+
+
+
+def read_data(path):
+    if '.jsonl' in path:
+        with open(path, 'r') as json_file:
+            data_output = [json.loads(line) for line in json_file]
+    else:
+        with open(path, 'r') as json_file:
+            data_output = json.load(json_file)
+    return data_output
+
+
+
+
+def eval_model(args, tokenizer, model, image_processor, context_len):
+    # Model
+    disable_torch_init()
+
+    qs = args.query
+    image_token_se = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN
+    if IMAGE_PLACEHOLDER in qs:
+        if model.config.mm_use_im_start_end:
+            qs = re.sub(IMAGE_PLACEHOLDER, image_token_se, qs)
+        else:
+            qs = re.sub(IMAGE_PLACEHOLDER, DEFAULT_IMAGE_TOKEN, qs)
+    else:
+        if model.config.mm_use_im_start_end:
+            qs = image_token_se + "\n" + qs
+        else:
+            qs = DEFAULT_IMAGE_TOKEN + "\n" + qs
+
+    if 'trustvl' in args.model_path:
+        # print("####Use TRUSTVL template")
+        conv = conv_templates[args.conv_mode].copy()
+    else:
+        # print("####Use default LLaVA template")
+        conv = conv_templates[args.conv_mode].copy()
+    conv.append_message(conv.roles[0], qs)
+    conv.append_message(conv.roles[1], None)
+    prompt = conv.get_prompt()
+
+    image_files = image_parser(args)
+    images = load_images(image_files)
+    image_sizes = [x.size for x in images]
+    images_tensor = process_images(
+        images,
+        image_processor,
+        model.config
+    ).to(model.device, dtype=torch.float16)
+
+    input_ids = (
+        tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt")
+        .unsqueeze(0)
+        .cuda()
+    )
+
+    if 'trustvl' in args.model_path:
+        folders = ["antifact_image_generation",
+        "coco_image_edit",
+        "coco_text_edit",
+        "fever_AI",
+        "gossipcop_midjourney",
+        "llm_gossip_md_generation",
+        "llm_rewrite",
+        "llm_science_md_generation",
+        "Fakeddit_photo_edit"]
+
+        source_ids = []
+        for image_file in image_files:
+            manipulation_flag = False
+            for folder_name in folders:
+                if folder_name in image_file:
+                    manipulation_flag = True
+            if manipulation_flag:
+                source_id = torch.tensor(0, dtype=torch.long)
+            else:
+                source_id = torch.tensor(1, dtype=torch.long)
+            source_ids.append(source_id)
+        source_ids = torch.stack(source_ids).to(model.device, dtype=torch.long)
+        with torch.inference_mode():
+            output_ids = model.generate(
+                input_ids,
+                images=images_tensor,
+                image_sizes=image_sizes,
+                source_ids=source_ids,
+                do_sample=True if args.temperature > 0 else False,
+                temperature=args.temperature,
+                top_p=args.top_p,
+                num_beams=args.num_beams,
+                max_new_tokens=args.max_new_tokens,
+                use_cache=True,
+            )
+    else:
+        with torch.inference_mode():
+            output_ids = model.generate(
+                input_ids,
+                images=images_tensor,
+                image_sizes=image_sizes,
+                do_sample=True if args.temperature > 0 else False,
+                temperature=args.temperature,
+                top_p=args.top_p,
+                num_beams=args.num_beams,
+                max_new_tokens=args.max_new_tokens,
+                use_cache=True,
+            )
+
+    outputs = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
+    
+    # print(outputs)
+    
+    return outputs
+
+
+def main(args):
+
+    data_eval = read_data(args.question_file)
+    questions = get_chunk(data_eval, args.num_chunks, args.chunk_idx)
+
+    if os.path.exists(args.answers_file):
+        start_idx = len(read_data(args.answers_file))
+    else:
+        start_idx = 0
+    questions = questions[start_idx:]
+
+    use_task_question = True
+    
+    model_path = args.model_path
+    model_name = get_model_name_from_path(model_path)
+    # model_base = None # None for fine-tuned models, "lmsys/vicuna-13b-v1.5" for lora
+    model_base = args.model_base
+    tokenizer, model, image_processor, context_len = load_pretrained_model(
+        model_path, model_base, model_name
+    )
+
+    print(model_path)
+    print(model.device)
+
+    
+    path_save = os.path.expanduser(args.answers_file)
+    os.makedirs(os.path.dirname(path_save), exist_ok=True)
+    print(path_save)
+
+    folders = ["antifact_image_generation",
+        "coco_image_edit",
+        "coco_text_edit",
+        "fever_AI",
+        "gossipcop_midjourney",
+        "llm_gossip_md_generation",
+        "llm_rewrite",
+        "llm_science_md_generation",
+        "Fakeddit_photo_edit"]
+
+    # label_map = {False: 0, True: 1}
+    for i, row in enumerate(tqdm(questions)):
+        # if 'text' in row['fake_cls']: continue
+        # if i+1 <= 522: continue
+        new_dict = {}
+        
+        caption = row['text']
+        image_file = os.path.join(args.image_folder, row['image_path'][1:])
+
+        
+        if 'trustvl' in model_path:
+
+            manipulation_flag = False
+            for folder_name in folders:
+                if folder_name in image_file:
+                    manipulation_flag = True
+            if use_task_question and manipulation_flag:
+                input_text = "<text> {text} </text> \n\nIs there any visual misinformation?"
+                input_prompt = input_text.format(text=caption)
+            else:
+                input_direct_evidence = row['direct_evidence']
+                input_inverse_evidence = row['inverse_evidence']
+                input_text = "<text> {text} </text> \n\n<direct evidence> {direct_evidence} </direct evidence> \n\n<inverse evidence> {inverse_evidence} </inverse evidence> \n\nIs there any cross-modal misinformation?"
+                input_prompt = input_text.format(text=caption,
+                                direct_evidence='; '.join(input_direct_evidence),
+                                inverse_evidence='; '.join(input_inverse_evidence))
+        else:
+            input_text = "<text> {text} </text> \n\nYour judegement:"
+            input_prompt = input_text.format(text=caption)
+
+        
+        eval_args = type('Args', (), {
+            "model_path": model_path,
+            "model_base": model_base,
+            "model_name": get_model_name_from_path(model_path),
+            "query": input_prompt,
+            "conv_mode": "trustvl_v1",
+            "image_file": image_file,
+            "sep": ",",
+            "temperature": 0,
+            "top_p": None,
+            "num_beams": 1,
+            "max_new_tokens": 1024
+        })()
+
+        answer = eval_model(eval_args, tokenizer, model, image_processor, context_len)
+        
+
+        new_dict['question_id'] = str(i+start_idx) + row['fake_cls'] #+ '-' + q_id
+        new_dict['news_text'] = row['text']
+        new_dict['image_path'] = row['image_path']
+        new_dict['fake_cls']= row['fake_cls']
+
+        new_dict["turns"] = []
+        new_dict["turns"].append(input_prompt)
+
+        choices = []
+        choices.append({"index": 0, "turns": [answer]})
+        new_dict["choices"]= choices
+        if "original" in row['fake_cls']:
+            new_dict["reference"] = 'real'
+        else:
+            new_dict["reference"] = 'fake'
+        
+        with open(path_save, 'a+') as fw_json: 
+            fw_json.write(json.dumps(new_dict, ensure_ascii=False) + "\n")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model-path", type=str, default="./checkpoints/trustvl-13b-task") 
+    parser.add_argument("--model-base", type=str, default=None)
+    parser.add_argument("--question-file", type=str, default="./data/eval/MMFakeBench_1000.jsonl")
+    parser.add_argument("--image-folder", type=str, default="./data/MMFakeBench_val")
+    parser.add_argument("--answers-file", type=str, default="./outputs/eval/MMFakeBench/answer_mmfakebench.jsonl")
+    parser.add_argument("--num-chunks", type=int, default=1)
+    parser.add_argument("--chunk-idx", type=int, default=0)
+    
+    args = parser.parse_args()
+
+    main(args)

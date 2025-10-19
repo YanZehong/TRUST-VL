@@ -1,10 +1,10 @@
 #!/bin/bash
 
-deepspeed llava/train/train_veritas.py \
+deepspeed llava/train/train_trustvl.py \
     --deepspeed ./scripts/zero3.json \
-    --model_name_or_path /home/zehong/LLaVA/checkpoints/llava-v1.5-13b-pretrain-1211k-finetune-665k \
+    --model_name_or_path ./checkpoints/trustvl-13b-stage2 \
     --version v1 \
-    --data_path ./data/instruction/finetune_198253_cmm_70k_vm_100k_tm_13k_mix_15k.json \
+    --data_path ./data/instruction/TRUST-Instruct_task198k.json \
     --image_folder ./data \
     --vision_tower openai/clip-vit-large-patch14-336 \
     --mm_projector_type mlp2x_gelu \
@@ -15,11 +15,11 @@ deepspeed llava/train/train_veritas.py \
     --image_aspect_ratio pad \
     --group_by_modality_length True \
     --bf16 True \
-    --output_dir ./checkpoints/veritas-13b-pretrain_1211k-finetune_665k-newstune_198k \
+    --output_dir ./checkpoints/trustvl-13b-task \
     --num_train_epochs 3 \
-    --per_device_train_batch_size 8 \
+    --per_device_train_batch_size 16 \
     --per_device_eval_batch_size 1 \
-    --gradient_accumulation_steps 2 \
+    --gradient_accumulation_steps 1 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 10000 \
