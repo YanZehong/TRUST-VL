@@ -64,7 +64,7 @@ git lfs install
 git clone https://huggingface.co/NUSryan/TRUST-VL-13b-task
 ```
 
-> **Note**: The checkpoint optimized for general question answering is currently undergoing testing.
+> **Note**: The checkpoint optimized for general question is currently undergoing testing.
 
 ## Training
 TRUST-VL training consists of three stages:
