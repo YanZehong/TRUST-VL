@@ -5,7 +5,7 @@
 <!-- markdownlint-disable no-duplicate-header -->
 
 <div align="center">
-  <img src="https://github.com/YanZehong/TRUST-VL/images/trust-vl-logo.png" width="60%" alt="TRUST-VL" />
+  <img src="https://github.com/YanZehong/TRUST-VL/blob/main/images/trust-vl-logo.png" width="60%" alt="TRUST-VL" />
 </div>
 <hr>
 <div align="center" style="line-height: 1;">
