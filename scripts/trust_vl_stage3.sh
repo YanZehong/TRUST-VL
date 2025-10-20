@@ -3,8 +3,8 @@
 deepspeed llava/train/train_trustvl.py \
     --deepspeed ./scripts/zero3.json \
     --model_name_or_path ./checkpoints/trustvl-13b-stage2 \
-    --version v1 \
-    --data_path ./data/instruction/TRUST-Instruct_task198k.json \
+    --version trustvl_v1 \
+    --data_path ./data/TRUST-Instruct_task198k.json \
     --image_folder ./data \
     --vision_tower openai/clip-vit-large-patch14-336 \
     --mm_projector_type mlp2x_gelu \
@@ -22,7 +22,7 @@ deepspeed llava/train/train_trustvl.py \
     --gradient_accumulation_steps 1 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
-    --save_steps 10000 \
+    --save_steps 50000 \
     --save_total_limit 1 \
     --learning_rate 2e-5 \
     --weight_decay 0. \

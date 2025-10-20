@@ -173,7 +173,7 @@ def main(args):
     
     data_dict = {
         "mocheg": ["./data/eval/MOCHEG_400.jsonl", "./data", f"./outputs/eval/MOCHEG/test/{os.path.basename(args.model_path)}.jsonl"],
-        "fakeddit": ["./data/eval/Fakeddit-M_400.jsonl", "./data", f"./outputs/eval/Fakeddit/test/{os.path.basename(args.model_path)}jsonl"],
+        "fakeddit": ["./data/eval/Fakeddit-M_400.jsonl", "./data", f"./outputs/eval/Fakeddit/test/{os.path.basename(args.model_path)}.jsonl"],
         "verite": ["./data/eval/VERITE_400.jsonl", "./data", f"./outputs/eval/VERITE/test/{os.path.basename(args.model_path)}.jsonl"],
     }
 
