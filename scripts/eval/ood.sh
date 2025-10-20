@@ -17,42 +17,21 @@ done
 
 wait
 
-output_file="./outputs/eval/MOCHEG/$SPLIT/$CKPT/merge.jsonl"
-
-# Clear out the output file if it exists.
-> "$output_file"
-
-# Loop through the indices and concatenate each file.
-for IDX in $(seq 0 $((CHUNKS-1))); do
-    cat ./outputs/eval/MOCHEG/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl >> "$output_file"
-done
+output_file="./outputs/eval/MOCHEG/$SPLIT/$CKPT.jsonl"
 
 python ./llava/eval/eval_results.py \
     --judge_file $output_file &
 
+wait
 
-output_file="./outputs/eval/Fakeddit/$SPLIT/$CKPT/merge.jsonl"
-
-# Clear out the output file if it exists.
-> "$output_file"
-
-# Loop through the indices and concatenate each file.
-for IDX in $(seq 0 $((CHUNKS-1))); do
-    cat ./outputs/eval/Fakeddit/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl >> "$output_file"
-done
+output_file="./outputs/eval/Fakeddit/$SPLIT/$CKPT.jsonl"
 
 python ./llava/eval/eval_results.py \
     --judge_file $output_file &
 
-output_file="./outputs/eval/VERITE/$SPLIT/$CKPT/merge.jsonl"
+wait
 
-# Clear out the output file if it exists.
-> "$output_file"
-
-# Loop through the indices and concatenate each file.
-for IDX in $(seq 0 $((CHUNKS-1))); do
-    cat ./outputs/eval/VERITE/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl >> "$output_file"
-done
+output_file="./outputs/eval/VERITE/$SPLIT/$CKPT.jsonl"
 
 python ./llava/eval/eval_results.py \
     --judge_file $output_file &
