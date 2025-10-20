@@ -1,7 +1,6 @@
 import os
 import json
 import pandas as pd
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import re
 from tqdm import tqdm
 import argparse
@@ -27,7 +26,6 @@ from llava.mm_utils import (
 
 from PIL import Image
 import requests
-from PIL import Image
 from io import BytesIO
 import math
 import numpy as np

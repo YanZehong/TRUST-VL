@@ -1,7 +1,6 @@
 import os
 import json
 import pandas as pd
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import re
 from tqdm import tqdm
 import argparse
@@ -25,7 +24,6 @@ from llava.mm_utils import (
 
 from PIL import Image
 import requests
-from PIL import Image
 from io import BytesIO
 import math
 import random
@@ -62,10 +60,13 @@ def load_images(image_files):
     return out
 
 
-
 def read_data(path):
-    with open(path, 'r') as json_file:
-        data_output = [json.loads(line) for line in json_file]
+    if '.jsonl' in path:
+        with open(path, 'r') as json_file:
+            data_output = [json.loads(line) for line in json_file]
+    else:
+        with open(path, 'r') as json_file:
+            data_output = json.load(json_file)
     return data_output
 
 

@@ -31,6 +31,5 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
 done
 
 python ./llava/eval/eval_results.py \
-    --judge_file $output_file \
-    --label_reference 'mixed' &
+    --judge_file $output_file &
 

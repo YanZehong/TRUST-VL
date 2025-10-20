@@ -57,11 +57,11 @@ pip install flash-attn==2.6.3 --no-build-isolation #--no-cache-dir
 
 ## Model Weights
 
-Please check out [🤗 Huggingface Models](https://huggingface.co/) for public LLaVA checkpoints.
+Please check out [🤗 Huggingface Models](https://huggingface.co/NUSryan/TRUST-VL-13b-task) for public TRUST-VL checkpoints.
 
 ```
 git lfs install
-git clone https://huggingface.co
+git clone https://huggingface.co/NUSryan/TRUST-VL-13b-task
 ```
 
 ## Training
@@ -157,11 +157,18 @@ After downloading all of them, organize the data as follows in `./data`,
 Training script with DeepSpeed ZeRO-3: [`trust_vl_stage3.sh`](https://github.com/YanZehong/TRUST-VL/blob/main/scripts/trust_vl_stage3.sh).
 
 ## Evals
-In TRUST-VL, we evaluate models on a diverse set of 7 misinformation benchmarks. For example,
+In TRUST-VL, we evaluate models on a diverse set of 7 misinformation benchmarks. 
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 bash /home/zehong/TRUST-VL/scripts/eval/newsclippings.sh
+# Single GPU inference.
+CUDA_VISIBLE_DEVICES=0 bash scripts/eval/mmfakebench.sh
+CUDA_VISIBLE_DEVICES=0 bash scripts/eval/ood.sh
+
+# Multi-GPU inference.
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 bash scripts/eval/newsclippings.sh 
 ```
+
+> **Note**: Please ensure that the corresponding image data for each evaluation dataset has been properly downloaded before running the evaluation.
 
 
 ## Citation
