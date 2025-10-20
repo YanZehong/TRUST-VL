@@ -64,6 +64,8 @@ git lfs install
 git clone https://huggingface.co/NUSryan/TRUST-VL-13b-task
 ```
 
+> **Note**: The checkpoint optimized for general question answering is currently undergoing testing.
+
 ## Training
 TRUST-VL training consists of three stages:
 In Stage 1, we begin by training the projection module for one epoch on 1.2 million image–text pairs (653K news samples from VisualNews and 558K samples from the LLaVA training corpus). This stage aligns the visual features with the language model. In Stage 2, we jointly train  the LLM and the projection module for one epoch using 665K synthetic conversation samples from the LLaVA training corpus to improve the  model’s ability to follow complex instructions. In Stage 3, we fine-tune the full model on 198K reasoning samples from TRUST-Instruct for three epochs to further enhance its misinformation-specific reasoning capabilities.  
