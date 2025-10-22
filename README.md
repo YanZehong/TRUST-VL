@@ -23,7 +23,8 @@
 </div>
 
 ## News
-[2025/09/06] 🔥 TRUST-VL is realsed. Model checkpoints and TRUST-Instruct is coming soon. Checkout the [paper](https://arxiv.org/abs/2509.04448) for more details.
+[2025/10/21] 🔥 The TRUST-VL-13B [model checkpoint](https://huggingface.co/NUSryan/TRUST-VL-13b-task) and TRUST-Instruct [instruction dataset](https://huggingface.co/datasets/NUSryan/TRUST-Instruct) are now publicly available!
+[2025/09/06] 🔥 TRUST-VL is realsed. Checkout the [paper](https://arxiv.org/abs/2509.04448) for more details.
 
 ## Contents
 - [Quickstart](#quickstart)
@@ -64,7 +65,6 @@ git lfs install
 git clone https://huggingface.co/NUSryan/TRUST-VL-13b-task
 ```
 
-> **Note**: The checkpoint optimized for general question is currently undergoing testing.
 
 ## Training
 TRUST-VL training consists of three stages:
