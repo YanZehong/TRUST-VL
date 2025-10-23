@@ -187,6 +187,6 @@ If you find our paper and code useful in your research, please consider giving a
 ```
 
 ## Acknowledgement
-LLaVA, Vicuna: Thanks to their amazing works.
+We would like to thank LLaVA and Vicuna for their amazing works. We also appreciate the benchmarks: MMFakeBench, Factify2, DGM$^4$, NewsCLIPpings, MOCHEG, Fakeddit, VERITE and VisualNews.
 
 **Usage and License Notices**: This project utilizes certain datasets and checkpoints that are subject to their respective original licenses. Users must comply with all terms and conditions of these original licenses, including but not limited to the OpenAI Terms of Use for the dataset and the specific licenses for base language models. This project does not impose any additional constraints beyond those stipulated in the original licenses. Furthermore, users are reminded to ensure that their use of the dataset and checkpoints is in compliance with all applicable laws and regulations.
