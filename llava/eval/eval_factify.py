@@ -209,7 +209,6 @@ def main(args):
     print(path_save)
 
     
-    # label_map = {False: 0, True: 1}
     for i, row in enumerate(tqdm(questions)):
         
         new_dict = {}
@@ -231,14 +230,8 @@ def main(args):
                                 context_evidence=input_inverse_evidence)
             
         else:
-            input_inverse_evidence = row['textual_evidence']
-            tokens = tokenizer.encode(input_inverse_evidence, truncation=True, max_length=2048)
-            input_inverse_evidence = tokenizer.decode(tokens, skip_special_tokens=True)
-
-            input_text = "<text> {text} </text> \n\n<direct evidence> {direct_evidence} </direct evidence> \n\n<inverse evidence> {inverse_evidence} </inverse evidence> \n\nYour judgement:"
-            input_prompt = input_text.format(text=row['caption'],
-                                direct_evidence='',
-                                inverse_evidence=input_inverse_evidence)
+            input_text = "Task description: some rumormongers intentionally write fake news, manipulate images, or use images from other news events to make multimodal misinformation. Given a news text and a news image, you are responsible for judging whether the given text and image are both credible and faithfully represent the news event. For final judgement, you should output either 'Real' or 'Fake' depending on whether you think the given text and accompanying image are both truthful and consistent: 'Real' if the news is factually correct and the image faithfully represent the news text, or 'Fake' if the news is misleading, manipulated or the image is wrongly used in the news text. Your judgement must be either 'Real' or 'Fake'. \n\nCaption: {text} \n\nYour judgement:"
+            input_prompt = input_text.format(text=row['caption'])
 
                     
         eval_args = type('Args', (), {

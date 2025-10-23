@@ -122,8 +122,6 @@ def eval_model(args, tokenizer, model, image_processor, context_len):
             else: 
                 source_id = torch.tensor(3, dtype=torch.long)
 
-            # print(image_file, prompt, source_id)
-
             source_ids.append(source_id)
 
         source_ids = torch.stack(source_ids).to(model.device, dtype=torch.long)

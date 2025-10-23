@@ -214,10 +214,7 @@ def main(args):
         "llm_science_md_generation",
         "Fakeddit_photo_edit"]
 
-    # label_map = {False: 0, True: 1}
     for i, row in enumerate(tqdm(questions)):
-        # if 'text' in row['fake_cls']: continue
-        # if i+1 <= 522: continue
         new_dict = {}
         
         caption = row['text']
@@ -241,7 +238,7 @@ def main(args):
                                 direct_evidence='; '.join(input_direct_evidence),
                                 inverse_evidence='; '.join(input_inverse_evidence))
         else:
-            input_text = "<text> {text} </text> \n\nYour judegement:"
+            input_text = "Task description: some rumormongers intentionally write fake news, manipulate images, or use images from other news events to make multimodal misinformation. Given a news text and a news image, you are responsible for judging whether the given text and image are both credible and faithfully represent the news event. For final judgement, you should output either 'Real' or 'Fake' depending on whether you think the given text and accompanying image are both truthful and consistent: 'Real' if the news is factually correct and the image faithfully represent the news text, or 'Fake' if the news is misleading, manipulated or the image is wrongly used in the news text. Your judgement must be either 'Real' or 'Fake'. \n\nCaption: {text} \n\nYour judgement:"
             input_prompt = input_text.format(text=caption)
 
         
