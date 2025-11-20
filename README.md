@@ -179,11 +179,20 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 bash scripts/eval/newsclippings.sh
 If you find our paper and code useful in your research, please consider giving a star ⭐ and citation 📝 :)
 
 ```bibtex
-@article{yan2025trustvl,
-  title={{TRUST-VL}: An Explainable News Assistant for General Multimodal Misinformation Detection},
-  author={Yan, Zehong and Qi, Peng and Hsu, Wynne and Lee, Mong Li},
-  journal={arXiv preprint arXiv:2509.04448},
-  year={2025}
+@inproceedings{yan-etal-2025-trust,
+    title = "{TRUST}-{VL}: An Explainable News Assistant for General Multimodal Misinformation Detection",
+    author = "Yan, Zehong  and
+      Qi, Peng  and
+      Hsu, Wynne  and
+      Lee, Mong-Li",
+    booktitle = "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2025",
+    address = "Suzhou, China",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.emnlp-main.284/",
+    pages = "5588--5604",
+    ISBN = "979-8-89176-332-6",
 }
 ```
 
